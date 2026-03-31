@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdgeSentinel — Zero-Trust IoT Security Gateway</title>
+  <link rel="stylesheet" href="src/css/main.css" />
+  <link rel="stylesheet" href="src/css/viewer.css" />
+</head>
+<body>
+
+<!-- ============================================================
+  NAV
+  ============================================================ -->
+<nav class="site-nav">
+  <a href="#hero" class="nav-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    </svg>
+    EDGE<span style="color:var(--text-secondary)">SENTINEL</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#problem">PROBLEM</a></li>
+    <li><a href="#zerotrust">ZERO-TRUST</a></li>
+    <li><a href="#layers">LAYERS</a></li>
+    <li><a href="#hardware">HARDWARE</a></li>
+    <li><a href="#architecture">ARCHITECTURE</a></li>
+    <li><a href="#glossary">GLOSSARY</a></li>
+    <li><a href="admin.html" style="color:var(--cyan)">ADMIN →</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================
+  HERO
+  ============================================================ -->
+<section id="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">// PROJECT KPR — HACKATHON 2026</div>
+    <h1 class="hero-title">
+      Zero-Trust IoT
+      <span>Security Gateway</span>
+    </h1>
+    <p class="hero-subtitle">
+      Every device is hostile until proven otherwise. Hardware-rooted identity,
+      mTLS mutual auth, and eBPF runtime enforcement — at the edge.
+    </p>
+    <div class="hero-ctas">
+      <a href="#problem" class="btn btn-primary">View Project ↓</a>
+      <a href="admin.html" class="btn btn-outline">Admin Dashboard →</a>
+    </div>
+  </div>
+  <div class="hero-gradient-fade"></div>
+  <div class="scroll-indicator">
+    <div class="scroll-arrow"></div>
+    SCROLL
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 2: THE PROBLEM
+  ============================================================ -->
+<section id="problem" class="section">
+  <div class="grid-bg"></div>
+  <div class="container">
+    <div class="section-label">01 — THE PROBLEM</div>
+    <h2 class="section-title reveal">The IoT Attack Surface is <span>Out of Control</span></h2>
+    <p class="reveal reveal-delay-1">Traditional networks blindly trust devices once they're inside the perimeter. IoT changes everything.</p>
+
+    <div class="problem-grid">
+      <!-- Incident Card -->
+      <div class="incident-card reveal reveal-delay-2">
+        <div class="incident-icon">⚠️</div>
+        <h3>OLDSMAR WATER PLANT ATTACK</h3>
+        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:12px;">
+          February 2021 — An attacker remotely accessed SCADA systems and attempted to poison 15,000 residents by increasing NaOH levels 111×.
+        </p>
+        <div class="incident-timeline">
+          <div class="timeline-item"><span class="time">08:00</span><span>Attacker gains remote access via TeamViewer</span></div>
+          <div class="timeline-item"><span class="time">08:03</span><span>NaOH setpoint changed: 111 ppm → 11,100 ppm</span></div>
+          <div class="timeline-item"><span class="time">08:05</span><span>Operator detects cursor movement, reverts</span></div>
+          <div class="timeline-item"><span class="time">08:06</span><span>FBI & DHS incident response initiated</span></div>
+        </div>
+        <div style="margin-top:16px; padding:10px; background:rgba(255,45,85,0.1); border-radius:2px;">
+          <p style="font-family:var(--font-mono); font-size:0.72rem; color:var(--red);">
+            ROOT CAUSE: No device identity verification. No behavioral monitoring. Flat network trust.
+          </p>
+        </div>
+      </div>
+
+      <!-- Vulnerability Cards -->
+      <div class="vuln-cards reveal reveal-delay-3">
+        <div class="vuln-card">
+          <div class="vuln-icon">👁️</div>
+          <h4>BLIND TRUST</h4>
+          <p>Devices trusted by IP/MAC alone. No hardware attestation. Spoofable in seconds.</p>
+        </div>
+        <div class="vuln-card">
+          <div class="vuln-icon">🪪</div>
+          <h4>NO IDENTITY</h4>
+          <p>Shared credentials. Static keys. No per-device certificate chain.</p>
+        </div>
+        <div class="vuln-card">
+          <div class="vuln-icon">👀</div>
+          <h4>NO BEHAVIOUR WATCH</h4>
+          <p>No runtime syscall monitoring. Compromised firmware goes undetected indefinitely.</p>
+        </div>
+        <div class="vuln-card">
+          <div class="vuln-icon">🔓</div>
+          <h4>NO ROLE LIMITS</h4>
+          <p>Any device can reach any service. Lateral movement is trivial post-compromise.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 3: ZERO-TRUST CONCEPT
+  ============================================================ -->
+<section id="zerotrust" class="section">
+  <div class="container">
+    <div class="section-label">02 — ZERO-TRUST CONCEPT</div>
+    <h2 class="section-title reveal">Old Network vs <span>Zero-Trust</span></h2>
+    <p class="reveal reveal-delay-1">In the old model, devices trust each other freely. Zero-Trust mandates every packet passes through a verified gateway.</p>
+
+    <div class="zt-compare">
+      <div class="zt-panel old reveal reveal-delay-2">
+        <h3>⚠ OLD NETWORK — Implicit Trust</h3>
+        <div class="zt-canvas-wrap">
+          <canvas id="old-network-canvas"></canvas>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px; font-family:var(--font-mono);">
+          Any device can reach any device. One compromise = full lateral spread.
+        </p>
+      </div>
+      <div class="zt-panel new reveal reveal-delay-3">
+        <h3>✓ ZERO-TRUST — Verify Everything</h3>
+        <div class="zt-canvas-wrap">
+          <canvas id="new-network-canvas"></canvas>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px; font-family:var(--font-mono);">
+          All traffic flows through the authenticated gateway. Rogue devices never reach services.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 4: 5 SECURITY LAYERS
+  ============================================================ -->
+<section id="layers" class="section">
+  <div class="grid-bg"></div>
+  <div class="container">
+    <div class="section-label">03 — SECURITY LAYERS</div>
+    <h2 class="section-title reveal">5-Layer <span>Defence Stack</span></h2>
+    <p class="reveal reveal-delay-1">Hardware-rooted trust at Layer 0, all the way to policy enforcement at the application layer.</p>
+
+    <div class="layers-layout">
+      <div id="layers-canvas-wrap" class="reveal reveal-delay-2"></div>
+
+      <div class="layer-tabs">
+
+        <div class="layer-tab active reveal reveal-delay-1" data-layer="0">
+          <div class="layer-tab-header">
+            <div class="layer-num">L1</div>
+            <h4>ATECC608B — Hardware Root of Trust</h4>
+          </div>
+          <div class="layer-description">
+            Cryptographic co-processor stores private keys in tamper-resistant hardware. Keys never leave the chip. Provides device identity certificates signed by our CA.
+          </div>
+        </div>
+
+        <div class="layer-tab reveal reveal-delay-2" data-layer="1">
+          <div class="layer-tab-header">
+            <div class="layer-num">L2</div>
+            <h4>mTLS — Mutual Authentication</h4>
+          </div>
+          <div class="layer-description">
+            Both client and server present X.509 certificates. No valid cert = no connection. Eliminates anonymous device access entirely.
+          </div>
+        </div>
+
+        <div class="layer-tab reveal reveal-delay-3" data-layer="2">
+          <div class="layer-tab-header">
+            <div class="layer-num">L3</div>
+            <h4>WireGuard — Encrypted Tunnel</h4>
+          </div>
+          <div class="layer-description">
+            All device traffic wrapped in WireGuard VPN. Lightweight, cryptographically modern. Devices invisible on the network unless authenticated.
+          </div>
+        </div>
+
+        <div class="layer-tab reveal reveal-delay-4" data-layer="3">
+          <div class="layer-tab-header">
+            <div class="layer-num">L4</div>
+            <h4>eBPF — Runtime Syscall Monitor</h4>
+          </div>
+          <div class="layer-description">
+            Linux kernel eBPF programs trace every syscall, network packet, and file access in real time. Anomalous behaviour triggers immediate quarantine.
+          </div>
+        </div>
+
+        <div class="layer-tab reveal reveal-delay-5" data-layer="4">
+          <div class="layer-tab-header">
+            <div class="layer-num">L5</div>
+            <h4>OPA — Policy Enforcement</h4>
+          </div>
+          <div class="layer-description">
+            Open Policy Agent enforces fine-grained access: which device can reach which service, with which method. Decisions logged, auditable.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 5: HARDWARE
+  ============================================================ -->
+<section id="hardware" class="section">
+  <div class="container">
+    <div class="section-label">04 — HARDWARE SETUP</div>
+    <h2 class="section-title reveal">Device Inventory</h2>
+    <p class="reveal reveal-delay-1">Physical test bench demonstrating legitimate and rogue device scenarios.</p>
+
+    <div class="hw-table-wrap reveal reveal-delay-2">
+      <table class="hw-table">
+        <thead>
+          <tr>
+            <th>DEVICE</th>
+            <th>ROLE</th>
+            <th>IP ADDRESS</th>
+            <th>MAC ADDRESS</th>
+            <th>CERT STATUS</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:var(--text-primary)">ESP32-S3 + ATECC608B</strong></td>
+            <td>Legitimate IoT Node</td>
+            <td class="mono">192.168.1.101</td>
+            <td class="mono">AA:BB:CC:DD:EE:01</td>
+            <td><span class="badge badge-online">✓ VALID</span></td>
+            <td><span class="badge badge-online"><span class="pulse pulse-green"></span>ONLINE</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text-primary)">Raspberry Pi Zero 2W</strong></td>
+            <td>Sensor Aggregator</td>
+            <td class="mono">192.168.1.102</td>
+            <td class="mono">AA:BB:CC:DD:EE:02</td>
+            <td><span class="badge badge-online">✓ VALID</span></td>
+            <td><span class="badge badge-online"><span class="pulse pulse-green"></span>ONLINE</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--red)">Rogue ESP32 (Attacker)</strong></td>
+            <td>Simulated Threat Actor</td>
+            <td class="mono">192.168.1.199</td>
+            <td class="mono">DE:AD:BE:EF:CA:FE</td>
+            <td><span class="badge badge-offline">✗ INVALID</span></td>
+            <td><span class="badge badge-offline"><span class="pulse pulse-red"></span>BLOCKED</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:var(--text-primary)">Raspberry Pi 4 (Gateway)</strong></td>
+            <td>Security Gateway Host</td>
+            <td class="mono">192.168.1.1</td>
+            <td class="mono">AA:BB:CC:DD:FF:00</td>
+            <td><span class="badge badge-info">⚙ N/A</span></td>
+            <td><span class="badge badge-online"><span class="pulse pulse-cyan"></span>ACTIVE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 6: ARCHITECTURE
+  ============================================================ -->
+<section id="architecture" class="section">
+  <div class="grid-bg"></div>
+  <div class="container">
+    <div class="section-label">05 — SYSTEM ARCHITECTURE</div>
+    <h2 class="section-title reveal">Animated <span>Data Flow</span></h2>
+    <p class="reveal reveal-delay-1">Legitimate devices (cyan/green) flow through the gateway and reach services. The rogue device (red) is rejected at the perimeter.</p>
+
+    <div id="arch-canvas-wrap" class="reveal reveal-delay-2"></div>
+
+    <div style="display:flex; gap:24px; margin-top:16px; flex-wrap:wrap;" class="reveal reveal-delay-3">
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.75rem; color:var(--cyan);">
+        <span style="width:20px; height:2px; background:var(--cyan); display:block;"></span> Authenticated Traffic
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.75rem; color:var(--red);">
+        <span style="width:20px; height:2px; background:var(--red); display:block; border-top: 2px dashed var(--red); height:0;"></span> Rejected / Rogue
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted);">
+        ● Animated dots = data packets in transit
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 7: LIVE DEMO STEPS
+  ============================================================ -->
+<section id="demo-steps" class="section">
+  <div class="container">
+    <div class="section-label">06 — LIVE DEMO</div>
+    <h2 class="section-title reveal">Demo <span>Walkthrough</span></h2>
+    <p class="reveal reveal-delay-1">Four stages demonstrating the security gateway in action. Click each step to expand.</p>
+
+    <div class="timeline reveal reveal-delay-2">
+
+      <div class="timeline-step active">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3>Legitimate Device Connects</h3>
+            <span class="badge badge-online"><span class="pulse pulse-green"></span>ONLINE</span>
+          </div>
+          <div class="step-details">
+            ESP32-S3 powers on. ATECC608B generates ephemeral key, presents signed cert. mTLS handshake completes in 34ms. WireGuard tunnel established. Device receives policy: ALLOW → sensor/*, DENY → actuator/*.
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3>Normal Sensor Data Flow</h3>
+            <span class="badge badge-online"><span class="pulse pulse-green"></span>RUNNING</span>
+          </div>
+          <div class="step-details">
+            Temperature and humidity readings published to MQTT broker. OPA validates topic-level permissions. eBPF monitors for anomalous syscall patterns. All traffic encrypted in WireGuard tunnel.
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3>Rogue Device Attempts Join</h3>
+            <span class="badge badge-offline"><span class="pulse pulse-red"></span>BLOCKED</span>
+          </div>
+          <div class="step-details">
+            Rogue ESP32 presents self-signed certificate. mTLS handshake fails — cert not in trusted CA chain. WireGuard refuses tunnel. OPA logs DENY event. IP quarantined at eBPF layer.
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3>Unauthorized Command Attempt</h3>
+            <span class="badge badge-offline"><span class="pulse pulse-red"></span>DENIED</span>
+          </div>
+          <div class="step-details">
+            Rogue device attempts actuator/relay FORCE_OPEN command. OPA policy requires device_cert + role:actuator. Neither satisfied. Command dropped silently. Alert raised in dashboard.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 8: ATTACK VS DEFENCE
+  ============================================================ -->
+<section id="attack-defence" class="section">
+  <div class="grid-bg"></div>
+  <div class="container">
+    <div class="section-label">07 — ATTACK VS DEFENCE</div>
+    <h2 class="section-title reveal">Attack Surface <span>Neutralised</span></h2>
+
+    <div class="ad-table-wrap reveal reveal-delay-2">
+      <table class="ad-table">
+        <thead>
+          <tr>
+            <th style="color:var(--text-secondary)">ATTACK VECTOR</th>
+            <th>❌ WITHOUT GATEWAY</th>
+            <th>✓ WITH EDGESENTINEL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MAC Spoofing</td>
+            <td class="attack-col">Device trusted immediately</td>
+            <td class="defence-col">Hardware cert required — spoof fails</td>
+          </tr>
+          <tr>
+            <td>Rogue Device Join</td>
+            <td class="attack-col">Joins network freely</td>
+            <td class="defence-col">mTLS rejects — no CA signature</td>
+          </tr>
+          <tr>
+            <td>Firmware Compromise</td>
+            <td class="attack-col">Runs silently, undetected</td>
+            <td class="defence-col">eBPF detects syscall anomaly, quarantines</td>
+          </tr>
+          <tr>
+            <td>Lateral Movement</td>
+            <td class="attack-col">Unrestricted device-to-device</td>
+            <td class="defence-col">OPA role policies block cross-service access</td>
+          </tr>
+          <tr>
+            <td>Credential Theft</td>
+            <td class="attack-col">Shared keys reusable forever</td>
+            <td class="defence-col">Per-device hardware keys — non-exportable</td>
+          </tr>
+          <tr>
+            <td>MITM / Eavesdrop</td>
+            <td class="attack-col">Plaintext MQTT traffic intercepted</td>
+            <td class="defence-col">WireGuard ChaCha20 encryption, full tunnel</td>
+          </tr>
+          <tr>
+            <td>Port Scan / Recon</td>
+            <td class="attack-col">All ports visible and reachable</td>
+            <td class="defence-col">eBPF XDP drops at kernel, ports invisible</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="success-rate reveal reveal-delay-3">
+      <span class="label">ATTACK SUCCESS RATE</span>
+      <div class="counter" data-final="0">100%</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 9: WHY WE WIN
+  ============================================================ -->
+<section id="why-win" class="section">
+  <div class="container">
+    <div class="section-label">08 — WHY WE WIN</div>
+    <h2 class="section-title reveal">Competitive <span>Advantage</span></h2>
+
+    <div class="win-grid">
+      <div class="win-card reveal reveal-delay-1">
+        <div class="win-icon">🔩</div>
+        <div class="win-stat" data-count-to="5" data-suffix=" Layers">0 Layers</div>
+        <h3>TECH DEPTH</h3>
+        <p>Hardware → kernel → policy. Full-stack security, not surface patching.</p>
+      </div>
+      <div class="win-card reveal reveal-delay-2">
+        <div class="win-icon">💰</div>
+        <div class="win-stat" data-count-to="60" data-prefix="$" data-suffix="B">$0B</div>
+        <h3>MARKET SIZE</h3>
+        <p>IoT security market by 2030. First-mover advantage in hardware-rooted zero-trust.</p>
+      </div>
+      <div class="win-card reveal reveal-delay-3">
+        <div class="win-icon">⚡</div>
+        <div class="win-stat" data-count-to="34" data-suffix="ms">0ms</div>
+        <h3>LOW LATENCY</h3>
+        <p>mTLS + WireGuard handshake completes in 34ms. Real-time IoT compatible.</p>
+      </div>
+      <div class="win-card reveal reveal-delay-4">
+        <div class="win-icon">🏭</div>
+        <div class="win-stat">COTS</div>
+        <h3>NOVELTY</h3>
+        <p>Built entirely from commercial-off-the-shelf hardware. Sub-$50 gateway cost.</p>
+      </div>
+      <div class="win-card reveal reveal-delay-5">
+        <div class="win-icon">📡</div>
+        <div class="win-stat" data-count-to="0" data-suffix="%">100%</div>
+        <h3>ATTACK SUCCESS</h3>
+        <p>Zero successful breaches in all test scenarios with rogue device attacks.</p>
+      </div>
+      <div class="win-card reveal reveal-delay-1">
+        <div class="win-icon">🔬</div>
+        <div class="win-stat">eBPF</div>
+        <h3>KERNEL-LEVEL</h3>
+        <p>Runtime monitoring at the Linux kernel. Impossible to evade from userspace.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  SECTION 10: GLOSSARY
+  ============================================================ -->
+<section id="glossary" class="section">
+  <div class="grid-bg"></div>
+  <div class="container">
+    <div class="section-label">09 — GLOSSARY</div>
+    <h2 class="section-title reveal">Technical <span>Reference</span></h2>
+    <p class="reveal reveal-delay-1">Hover any card to reveal the definition.</p>
+
+    <div class="glossary-search reveal reveal-delay-2">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search terms..." />
+    </div>
+
+    <div class="glossary-grid reveal reveal-delay-3">
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>Zero-Trust</h4></div>
+          <div class="gloss-back"><p>Security model: never trust, always verify. Every device authenticated regardless of network location.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>mTLS</h4></div>
+          <div class="gloss-back"><p>Mutual TLS: both client and server authenticate via X.509 certificates. Bi-directional identity verification.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>ATECC608B</h4></div>
+          <div class="gloss-back"><p>Microchip cryptographic co-processor. Stores private keys in tamper-resistant hardware. Keys never exported.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>WireGuard</h4></div>
+          <div class="gloss-back"><p>Modern VPN protocol. Uses Curve25519 + ChaCha20-Poly1305. 4,000 lines of code vs 100,000 for OpenVPN.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>eBPF</h4></div>
+          <div class="gloss-back"><p>Extended Berkeley Packet Filter. Runs sandboxed programs inside Linux kernel. Used for tracing, networking, and security.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>OPA</h4></div>
+          <div class="gloss-back"><p>Open Policy Agent. General-purpose policy engine using Rego language. Decouples policy from application logic.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>MQTT</h4></div>
+          <div class="gloss-back"><p>Lightweight publish-subscribe messaging protocol for IoT. Runs over TCP/IP, optimised for constrained devices.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>PKI</h4></div>
+          <div class="gloss-back"><p>Public Key Infrastructure. Hierarchy of certificate authorities used to issue and verify X.509 device certificates.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>XDP</h4></div>
+          <div class="gloss-back"><p>eXpress Data Path. eBPF hook that processes packets before they enter the kernel network stack. Ultra-low latency drop/redirect.</p></div>
+        </div>
+      </div>
+      <div class="gloss-card">
+        <div class="gloss-inner">
+          <div class="gloss-front"><h4>SCADA</h4></div>
+          <div class="gloss-back"><p>Supervisory Control and Data Acquisition. Industrial control systems — water plants, power grids, factories. Common attack target.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  FOOTER
+  ============================================================ -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="glow-line"></div>
+    <div style="height:32px;"></div>
+    <div class="footer-inner">
+      <div class="footer-logo">EDGE<span style="opacity:0.5">SENTINEL</span></div>
+      <div class="footer-meta">
+        PROJECT KPR — ZERO-TRUST IOT SECURITY GATEWAY<br/>
+        HACKATHON 2026 &nbsp;|&nbsp; TEAM KPR &nbsp;|&nbsp; <span style="color:var(--cyan)">BUILD THE EDGE</span>
+      </div>
+      <div class="footer-links">
+        <a href="admin.html">Admin Dashboard</a>
+        <a href="#hero">Back to Top ↑</a>
+        <a href="#" onclick="window.print(); return false;">Save as PDF</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script type="module" src="src/js/viewer.js"></script>
+</body>
+</html>

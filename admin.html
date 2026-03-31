@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EdgeSentinel — Admin Dashboard</title>
+  <link rel="stylesheet" href="src/css/main.css" />
+  <link rel="stylesheet" href="src/css/admin.css" />
+</head>
+
+<body class="admin-body">
+
+  <div class="admin-wrapper">
+
+    <!-- ========== TOP BAR ========== -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <a href="index.html" class="topbar-logo">EDGE<span style="opacity:0.5">SENTINEL</span></a>
+        <span class="topbar-subtitle">// SECURITY OPERATIONS CENTER</span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-time" id="topbar-time">00:00:00</span>
+        <span id="gateway-badge" class="badge badge-online"><span id="gateway-dot"
+            class="pulse pulse-green"></span>GATEWAY ONLINE</span>
+        <button id="logout-btn" class="btn btn-outline" style="padding:6px 16px; font-size:0.65rem;">LOGOUT</button>
+      </div>
+    </header>
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">MONITOR</div>
+        <ul class="sidebar-nav">
+          <li><a href="#" class="active"><span class="nav-icon">📊</span> Overview</a></li>
+          <li><a href="#"><span class="nav-icon">📡</span> Live Feed</a></li>
+          <li><a href="#"><span class="nav-icon">⚠️</span> Alerts</a></li>
+          <li><a href="#"><span class="nav-icon">📋</span> OPA Policies</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">DEVICES</div>
+        <ul class="sidebar-nav">
+          <li><a href="#"><span class="nav-icon">🟢</span> ESP32-S3</a></li>
+          <li><a href="#"><span class="nav-icon">🟢</span> Pi Zero 2W</a></li>
+          <li><a href="#"><span class="nav-icon">🔴</span> Rogue ESP32</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">TOOLS</div>
+        <ul class="sidebar-nav">
+          <li><a href="#"><span class="nav-icon">🔬</span> Attack Sim</a></li>
+          <li><a href="#"><span class="nav-icon">🔐</span> Certs</a></li>
+          <li><a href="index.html"><span class="nav-icon">←</span> Viewer</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-bottom">
+        <div style="font-family:var(--font-mono); font-size:0.65rem; color:var(--text-muted); line-height:1.8;">
+          GATEWAY: 192.168.1.1<br />
+          UPTIME: <span id="stat-uptime">00:00:00</span><br />
+          BUILD: KPR-2026-03
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="admin-main">
+
+      <!-- Stat Row -->
+      <div class="stat-row">
+        <div class="stat-card success corner-accent">
+          <div class="stat-label">DEVICES ONLINE</div>
+          <div class="stat-value" id="stat-devices">0</div>
+          <div class="stat-delta">registered devices</div>
+        </div>
+        <div class="stat-card corner-accent">
+          <div class="stat-label">ACTIVE THREATS</div>
+          <div class="stat-value" id="stat-threats">0</div>
+          <div class="stat-delta">non-trusted devices</div>
+        </div>
+        <div class="stat-card corner-accent">
+          <div class="stat-label">BLOCKED DEVICES</div>
+          <div class="stat-value" id="stat-blocked">0</div>
+          <div class="stat-delta">quarantine / blacklist</div>
+        </div>
+        <div class="stat-card corner-accent">
+          <div class="stat-label">AVG RISK SCORE</div>
+          <div class="stat-value" id="stat-score">0</div>
+          <div class="stat-delta">across all devices</div>
+        </div>
+      </div>
+
+      <!-- Device Status Cards -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span class="pulse pulse-cyan"
+              style="width:8px;height:8px;border-radius:50%;display:inline-block;background:var(--cyan);"></span>
+            DEVICE STATUS
+          </div>
+          <span class="badge badge-info">LIVE</span>
+        </div>
+        <div class="device-grid" id="device-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span style="color:var(--orange)">◉</span> LIVE SENSOR DATA</div>
+          <span class="badge badge-info">DHT11</span>
+        </div>
+        <div class="panel-body" id="sensor-panel">
+          <div style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted)">Waiting for sensor data…
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- Live Feed + Alerts row -->
+      <div class="admin-grid wide">
+
+        <!-- Live Feed -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span style="color:var(--green)">●</span> MQTT LIVE FEED
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="badge badge-info">AUTO-SCROLL</span>
+              <span class="badge badge-online" style="font-size:0.65rem;">
+                <span id="feed-count">0</span> msgs
+              </span>
+            </div>
+          </div>
+          <div class="feed-table-wrap">
+            <table class="feed-table" id="feed-table">
+              <thead>
+                <tr>
+                  <th>TIME</th>
+                  <th>DEVICE</th>
+                  <th>TOPIC</th>
+                  <th>DECISION</th>
+                  <th>PAYLOAD</th>
+                </tr>
+              </thead>
+              <tbody id="feed-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span style="color:var(--orange)">▲</span> ANOMALY ALERTS
+            </div>
+            <span class="badge badge-warn" id="alert-count-badge">0 alerts</span>
+          </div>
+          <div class="panel-body" style="padding:var(--space-sm);">
+            <div class="alerts-list" id="alerts-list"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- OPA Log + Net Chart row -->
+      <div class="admin-grid">
+
+        <!-- OPA Policy Log -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">⚖ OPA POLICY LOG</div>
+            <span class="badge badge-info">REAL-TIME</span>
+            <button onclick="verifyChain()" class="btn btn-outline"
+              style="padding:4px 10px;font-size:0.65rem;">VERIFY</button>
+            <button onclick="resetAll()" class="btn btn-danger"
+              style="padding:4px 10px;font-size:0.65rem;">RESET</button>
+          </div>
+          <div class="panel-body" style="padding:var(--space-sm);">
+            <div class="opa-list" id="opa-list"></div>
+          </div>
+        </div>
+
+        <!-- Network Graph -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📈 PACKETS / SEC — BY DEVICE</div>
+          </div>
+          <div class="panel-body">
+            <div class="net-chart-wrap">
+              <canvas id="pkt-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Attack Simulator -->
+      <div class="admin-grid">
+        <div class="sim-panel panel">
+          <div class="panel-header">
+            <div class="panel-title">💀 ATTACK SIMULATOR</div>
+            <span class="badge badge-offline">SIMULATION MODE</span>
+          </div>
+          <div class="sim-buttons">
+            <button class="sim-btn" onclick="runAttack('rogue')">🔴 Rogue device join — no HSM chip</button>
+            <button class="sim-btn" onclick="runAttack('portscan')">🔍 Port scan — Scapy detection</button>
+            <button class="sim-btn" onclick="runAttack('replay')">⚡ Replay attack — ML anomaly</button>
+            <button class="sim-btn" onclick="runAttack('policy')">⚖ Policy violation — unauthorized command</button>
+          </div>
+          <div class="sim-status">
+            <span class="mono" style="color:var(--text-muted)">// Click a button to simulate an attack vector</span>
+            <div id="sim-status-log"></div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">🛡 SYSTEM HEALTH</div>
+            <span class="badge badge-online">ALL SYSTEMS GO</span>
+          </div>
+          <div class="panel-body">
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-panel); border-radius:2px; font-family:var(--font-mono); font-size:0.75rem;">
+                <span style="color:var(--text-secondary)">ATECC608B</span>
+                <span class="badge badge-online">ACTIVE</span>
+              </div>
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-panel); border-radius:2px; font-family:var(--font-mono); font-size:0.75rem;">
+                <span style="color:var(--text-secondary)">mTLS Broker</span>
+                <span class="badge badge-online">LISTENING :8883</span>
+              </div>
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-panel); border-radius:2px; font-family:var(--font-mono); font-size:0.75rem;">
+                <span style="color:var(--text-secondary)">WireGuard VPN</span>
+                <span class="badge badge-online">2 PEERS UP</span>
+              </div>
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-panel); border-radius:2px; font-family:var(--font-mono); font-size:0.75rem;">
+                <span style="color:var(--text-secondary)">Scapy Monitor</span>
+                <span class="badge badge-online">TRACING</span>
+              </div>
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:var(--bg-panel); border-radius:2px; font-family:var(--font-mono); font-size:0.75rem;">
+                <span style="color:var(--text-secondary)">OPA Engine</span>
+                <span class="badge badge-online">v0.60.0</span>
+              </div>
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:rgba(255,45,85,0.05); border:1px solid var(--border-red); border-radius:2px; font-family:var(--font-mono); font-size:0.75rem;">
+                <span style="color:var(--text-secondary)">Quarantine List</span>
+                <span class="badge badge-offline">1 DEVICE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script type="module" src="src/js/admin.js"></script>
+</body>
+
+</html>
