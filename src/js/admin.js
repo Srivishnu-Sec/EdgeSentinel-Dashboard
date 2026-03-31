@@ -61,6 +61,7 @@ function connectSocket() {
     connected = false;
     setGatewayStatus(false);
     logAlert('warn', '⚠', 'Gateway disconnected — retrying…');
+    setTimeout(() => fetchAll(), 3000);
   });
  
   socket.on('device_update', (data) => {
